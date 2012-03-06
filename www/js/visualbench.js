@@ -129,23 +129,34 @@ $(document).ready(function () {
 			$.ajax({
 				url: '/data/' + dataset
 			, dataType: 'json'
+			, error: function () {
+					console.log('ERROR', arguments)
+				}
 			, success: function (data) {
 					var keys = Object.keys(data)
-					var html = render('keys', { name: name, keys: keys })
+					var keyIds = {}
+
+					// Replace some special characters messing with jQuery selector engine
+					var rex = RegExp('[\\.:]', 'g')
+					keys.forEach(function (key) {
+						keyIds[key.replace(rex, '_')] = key
+					})
+
+					var html = render('keys', { name: name, keys: keyIds })
 					var target = $('#' + name + '-keys')
 					target.empty()
 					$(html).appendTo(target)
 
-					keys.forEach(function (key) {
-						$('#' + key + '-' + name + '-key').each(function (i) {
-							$(this).click(function (e) {
-								e.preventDefault()
-								// console.log('<', data[key])
-								// console.log('>', transform( data[key] ))
-								plot.setData( transform( data[key] ) )
-								plot.setupGrid()
-							 	plot.draw()
-							})
+					Object.keys(keyIds).forEach(function (keyId) {
+						$('#' + keyId + '-' + name + '-key').click(function (e) {
+							e.preventDefault()
+							var key = keyIds[keyId]
+							
+							// console.log('<', data[key])
+							// console.log('>', transform( data[key] ))
+							plot.setData( transform( data[key] ) )
+							plot.setupGrid()
+							plot.draw()
 						})
 					})
 				}

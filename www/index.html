@@ -88,8 +88,8 @@ each item in files
       </script>
 
       <script id="keys-template" type="text/template">
-each item in keys
-  a.btn(id=item+"-"+name+"-key") #{item}
+each item,itemId in keys
+  a.btn(id=itemId+"-"+name+"-key") #{item}
       </script>
 
     </div> <!-- /container -->
@@ -106,6 +106,6 @@ each item in keys
 
     <script src="/js/jade.js"></script>
 
-    <script src="/js/visualbench.min.js"></script>
+    <script src="/js/visualbench.js"></script>
   </body>
 </html>
