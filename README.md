@@ -95,11 +95,12 @@ Point your web browser at `http://localhost:8080`
 
 Enjoy the results!
 
-![visualbench](https://github.com/pierrec/node-atok/tree/master/examples/vb.png)
+![visualbench](https://github.com/pierrec/node-atok/tree/master/img/vb.png)
 
 ## Credits
 
 Special thanks to...
 
+* [Flot](http://code.google.com/p/flot/)
 * [Bootstrap](http://twitter.github.com/bootstrap/index.html)
 * [Jade](http://jade-lang.com/)
