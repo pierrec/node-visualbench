@@ -95,7 +95,7 @@ Point your web browser at `http://localhost:8080`
 
 Enjoy the results!
 
-![visualbench](https://github.com/pierrec/node-visualbench/tree/master/img/vb.png)
+![visualbench](https://github.com/pierrec/node-visualbench/raw/master/img/vb.png)
 
 ## Credits
 
