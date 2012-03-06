@@ -1,0 +1,37 @@
+{
+  "author": "Pierre Curto"
+, "name": "visualbench"
+, "description": "Render data produced by bench in a browser"
+, "keywords": ["bench","visual"]
+, "version": "0.0.1"
+, "homepage": "http://github.com/pierrec/node-visualbench"
+, "repository": {
+    "type": "git"
+  , "url": "git://github.com/pierrec/node-visualbench.git"
+  }
+, "main": "./lib/bench.js"
+, "bin" : { "vbserver" : "./bin/server.js" }
+, "bugs": { "url" : "http://github.com/pierrec/node-visualbench/issues" }
+, "licenses":
+  [ {
+      "type": "MIT"
+    , "url": "http://github.com/pierrec/node-visualbench/raw/master/LICENSE"
+    }
+  ]
+, "engines": {
+    "node": ">= 0.6"
+  }
+, "dependencies": {
+    "bench": ">= 0.3.4"
+  , "fstream": ">= 0.1.13"
+  , "underscore": ">= 1.3.1"
+  , "debug": ">= 0.5.0"
+  , "commander": ">= 0.5.2"
+  , "filed": ">= 0.0.6"
+  , "fileset": ">= 0.1.1"
+  }
+, "devDependencies": {
+  }
+, "scripts": {
+  }
+}
