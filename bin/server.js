@@ -65,10 +65,15 @@ debug('vbRoot %s', vbRoot)
 
 http.createServer(function (req, res) {
   var url = req.url
+    , body = req.body
     , file
   
   debug('%s %s', req.method, url)
-  if ( url.substr(0, 5) === '/data' ) {
+  // Special case
+  if (url === '/package.json') {
+    file = path.join( vbRoot, '..', 'package.json' )
+  } else if ( url.substr(0, 5) === '/data' ) {
+  // Serve the requested file
     if (url.length === 5 || url.substr(-1) === '/') {
       // By default, load any json file found under the root directory
       // including those located in subdirs
