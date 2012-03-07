@@ -2,39 +2,10 @@
   Main function dealing with GUI elements and graphing
 **/
 $(document).ready(function () {
-	// List of available data sets
-	$.ajax({
-		url: 'data'
-	, dataType: 'json'
-	, success: function (data) {
-			var files = data.map(function (f) { return f.replace(/\.json/, '') })
-			var o = {
-				files: files.map( sanitize4id )
-			}
-			// Datasets menu
-			render('files', o, true)
-			// fix sub nav on scroll
-			var $win = $(window)
-			, $nav = $('.subnav')
-			, navTop = $nav.length && $nav.offset().top - 40
-
-			// processScroll()
-			// $win.on('scroll', processScroll)
-
-			function processScroll() {
-				$nav.toggleClass('subnav-fixed', ($win.scrollTop() >= navTop))
-			}
-			
-			// For each dataset, a graph is associated
-			render('graph', o, true)
-			// Initialize the graphs
-			files.forEach( initGraph )
-		}
-	})
-
-	/*
-		Templating engine helpers
-	**/
+	// Helpers
+	function setId (id) {
+		return 'id_' + id.replace(/[^a-zA-Z0-9_\-]/g, '_')
+	}
 	function render (name, obj, flag) {
 		var tpl = $('#' + name + '-template')
 			, html = tpl.text().trim()
@@ -43,10 +14,63 @@ $(document).ready(function () {
 		return flag ? tpl.after( fn(obj) ) : fn(obj)
 	}
 
+	// Render default UI components
+	$.ajax({
+		url: 'package.json'
+	, dataType: 'json'
+	, success: function (data) {
+			render('mainbar', data, true)
+
+			loadData()
+		}
+	})
+
+	// List of available data sets
+	function loadData () {
+		$.ajax({
+			url: 'data'
+		, dataType: 'json'
+		, success: function (data) {
+				var files = {}
+				
+				data.forEach(function (file) {
+					file = file.replace(/\.json$/, '')
+					files[ setId(file) ] = file
+				})
+				
+				var o = { files: files }
+
+				// console.log(o)
+				// Datasets menu
+				render('files', o, true)
+
+				var toc = $('#files')
+					, $document = $(document)
+				
+				$document.scroll(function() {
+					var flag = ($document.scrollTop() >= 40)
+
+					toc.toggleClass('subnav-fixed', flag)
+					// toc.scrollspy('refresh') // HACK: targets/offsets get emptied for some reason...
+				})
+
+				// For each dataset, a graph is associated
+				render('graph', o, true)
+				toc.scrollspy()
+
+				// Initialize the graphs
+				Object.keys(files).forEach(function (f) {
+					// console.log(f, files[f])
+					initGraph(f, files[f])
+				})
+			}
+		})
+	}
+
 	/*
 		Graphing library helper
 	**/
-	function initGraph (name) {
+	function initGraph (id, file) {
 		var options = {
 			series: {
 				lines: { show: true }
@@ -57,14 +81,14 @@ $(document).ready(function () {
 		, grid: { hoverable: true, clickable: true }
 		}
 
-		var placeholder = $('#' + sanitize4id(name) + '-graph')
+		var placeholder = $('#' + id + '-graph')
 		var plot
 
 		draw()
 
 		function draw () {
 			plot = $.plot(placeholder, [], options)
-			displayDataSet( name + '.json' )
+			displayDataSet( file )
 		}
 
 		function showTooltip(x, y, contents) {
@@ -83,7 +107,7 @@ $(document).ready(function () {
 
 		var previousPoint = null
 		placeholder.bind("plothover", function (event, pos, item) {
-			if ( $('#' + name + '-showTooltip.active').length > 0 ) {
+			if ( $('#' + id + ' .btn[title="Tooltip"].active').length > 0 ) {
 				if (item) {
 					if (previousPoint != item.dataIndex) {
 						previousPoint = item.dataIndex
@@ -106,18 +130,26 @@ $(document).ready(function () {
 		})
 
 		// Controls
-		$('#' + name + '-controls .btn').each(function (i) {
-			$(this).click(function (e) {
+		$('#' + id + '-controls').find('.btn').each(function (i) {
+			var $this = $(this)
+				, title = $this.attr('title')
+
+			$this.click(function (e) {
 				e.preventDefault()
-				switch (i) {
-					case 0:
+				switch (title) {
+					case 'Zoom out':
 						plot.zoomOut()
 					break
-					case 1:
+					case 'Zoom in':
 						plot.zoom()
 					break
-					case 2:
+					case 'Refresh':
 						draw()
+					break
+					case 'Download':
+						var p = $('#' + id + '-graph .flot-base')
+						var data = p[0].toDataURL('image/png')
+						document.location.href = data.replace('image/png', 'image/octet-stream')
 					break
 					default:
 				}
@@ -125,33 +157,32 @@ $(document).ready(function () {
 		})
 
 		function displayDataSet (dataset) {
-			console.log('Loading', dataset)
+			var url = '/data/' + dataset + '.json'
+			// console.log('Loading', url)
 			$.ajax({
-				url: '/data/' + dataset
+				url: url
 			, dataType: 'json'
-			, error: function () {
-					console.log('ERROR', arguments)
+			, error: function (xhr, status, msg) {
+					console.log('ERROR', url, msg)
 				}
 			, success: function (data) {
-					var keys = Object.keys(data)
-					var keyIds = {}
+					var keys = {}
 
-					// Replace some special characters messing with jQuery selector engine
-					var rex = RegExp('[\\.:]', 'g')
-					keys.forEach(function (key) {
-						keyIds[key.replace(rex, '_')] = key
+					Object.keys(data).forEach(function (key) {
+						keys[ setId(key) ] = key
 					})
 
-					var html = render('keys', { name: name, keys: keyIds })
-					var target = $('#' + name + '-keys')
+					var html = render('keys', { name: id, keys: keys })
+					var target = $('#' + id + '-keys')
+
 					target.empty()
 					$(html).appendTo(target)
 
-					Object.keys(keyIds).forEach(function (keyId) {
-						$('#' + keyId + '-' + name + '-key').click(function (e) {
+					Object.keys(keys).forEach(function (keyId) {
+						var key = keys[keyId]
+
+						$('#' + keyId + '-' + id + '-key').click(function (e) {
 							e.preventDefault()
-							var key = keyIds[keyId]
-							
 							// console.log('<', data[key])
 							// console.log('>', transform( data[key] ))
 							plot.setData( transform( data[key] ) )
@@ -162,10 +193,6 @@ $(document).ready(function () {
 				}
 			})
 		}
-	}
-
-	function sanitize4id (id) {
-		return id.replace( RegExp('[^a-zA-Z0-9_\\-:\\.]', 'g'), '_')
 	}
 
 	// Transform the raw benchmarks into something useable by `flot`
