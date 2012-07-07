@@ -51,7 +51,7 @@ for (var o in defaultConfig)
 
 // Get local config?
 var defaultConfigFile = path.join( '.', 'visualbench.json' )
-var config = path.existsSync(defaultConfigFile)
+var config = fs.existsSync(defaultConfigFile)
     ? _.defaults( require(defaultConfigFile), defaultConfig )
     : defaultConfig
 debug('config %j', config)
