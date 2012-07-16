@@ -1,6 +1,4 @@
-var bench = require('..')('var-swap')
 
-// Straight from the `bench` examples
 var foo = 1
   , bar = 2
 
@@ -22,5 +20,3 @@ exports.compare =
   , fnswap: fnswap
   , "nil function":function () {}
   }
-
-bench.runMain()

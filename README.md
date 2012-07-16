@@ -32,7 +32,17 @@ For more options, run `vbserver --help`.
 For debugging, run `DEBUG=http vbserver`.
 
 
-## Example
+## Example 1
+
+Go to the examples directory in the `node-visualbench` install directory.
+Run the following command:
+
+	../bin/vbserver
+
+Open the url `localhost:8080`.
+
+
+## Example 2
 
 First, generate some data.
 

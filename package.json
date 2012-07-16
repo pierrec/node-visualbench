@@ -3,7 +3,7 @@
 , "name": "visualbench"
 , "description": "Render data produced by bench in a browser"
 , "keywords": ["bench","visual"]
-, "version": "0.0.3"
+, "version": "0.0.4"
 , "homepage": "http://github.com/pierrec/node-visualbench"
 , "repository": {
     "type": "git"
@@ -19,7 +19,7 @@
     }
   ]
 , "engines": {
-    "node": ">= 0.6"
+    "node": ">= 0.8"
   }
 , "dependencies": {
     "bench": ">= 0.3.4"
